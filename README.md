@@ -19,3 +19,33 @@ const options = {
 };
 const formattedDate = new Intl.DateTimeFormat('ru-RU', options).format(new Date(str));
 Это работает и со строками типа timestamp "2024-11-30T14:29:42.782046"
+
+
+
+//Для инструкции по fanuc focas
+
+//В случае если нужно будет вызывать функции из такого файла как fwlib32.h 
+
+//WINDOWS
+class FanucFocas
+{
+    //Вызываем Си функции из библиотеки
+    private const string DllName = "Fwlib32.dll"
+    [DllImport(DllName, CallingConvention = CallingConvention.StdCall)]
+    public static extern short cnc_exeprgname2(ushort FlibHndl, StringBuilder progName);
+      //И потом вызываем где хотим нужные функции, которых нет в fwlib32.cs, например вот это:
+        StringBuilder progName = new StringBuilder(256); // Буфер для имени программы
+        short result = FanucFocas.cnc_exeprgname2(_handle, progName);
+        Console.WriteLine($"Название программы: {progName.ToString()}");
+}
+    
+//LINUX
+class FanucFocas
+{
+    private const string DllName = "libfwlib.so"; // Имя библиотеки на Linux
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+    public static extern short cnc_exeprgname2(ushort FlibHndl, StringBuilder progName);
+      //И потом вызываем где хотим нужные функции, которых нет в fwlib32.cs, например вот это:
+        StringBuilder progName = new StringBuilder(256);
+        short result = FanucFocas.cnc_exeprgname2(handle, progName);
+}
